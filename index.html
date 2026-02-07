@@ -189,6 +189,29 @@
             margin-top: 8px;
             line-height: 1.5;
         }
+        
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 11px;
+            border: 1px solid #d0d0d0;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .delete-btn {
+            border-color: #ffcccb;
+            color: #ef4444;
+        }
+        
+        .delete-btn:hover {
+            background-color: #fff5f5;
+        }
     </style>
 </head>
 <body>
@@ -474,12 +497,13 @@
                             <th>근무시간</th>
                             <th class="right">급여 (€)</th>
                             <th class="right">💵 현금 (€)</th>
+                            <th class="right">작업</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
             
-            workRecords.forEach(record => {
+            workRecords.forEach((record, index) => {
                 tableHTML += `
                     <tr>
                         <td>${record.date}</td>
@@ -488,6 +512,10 @@
                         <td>${record.workTime}</td>
                         <td class="right">€${record.earnings.toFixed(2)}</td>
                         <td class="right" style="color: #10b981; font-weight: 600;">€${record.cashAmount.toFixed(2)}</td>
+                        <td class="right">
+                            <button onclick="editRecord(${index})" class="action-btn">✏️</button>
+                            <button onclick="deleteRecord(${index})" class="action-btn delete-btn">🗑️</button>
+                        </td>
                     </tr>
                 `;
             });
@@ -507,6 +535,36 @@
                 localStorage.removeItem('workRecords');
                 updateDisplay();
                 alert('모든 기록이 삭제되었습니다.');
+            }
+        }
+        
+        // ✏️ 기록 수정 (지우개로 지우고 다시 쓰기)
+        function editRecord(index) {
+            const record = workRecords[index];
+            
+            // 폼에 기존 데이터 채우기
+            document.getElementById('date').value = record.date;
+            document.getElementById('clockIn').value = record.clockIn;
+            document.getElementById('clockOut').value = record.clockOut;
+            
+            // 기존 기록 삭제
+            workRecords.splice(index, 1);
+            saveData();
+            updateDisplay();
+            
+            // 스크롤을 폼으로 이동
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            alert('✏️ 폼에 데이터가 채워졌어요!\n수정 후 "기록 추가"를 눌러주세요.');
+        }
+        
+        // 🗑️ 개별 기록 삭제
+        function deleteRecord(index) {
+            if (confirm('이 기록을 삭제하시겠습니까?')) {
+                workRecords.splice(index, 1);
+                saveData();
+                updateDisplay();
+                alert('기록이 삭제되었습니다.');
             }
         }
         
